@@ -60,6 +60,10 @@ func (c *Commander) ListCommands() {
 	}
 }
 
+func (c *Commander) getCommands() map[string]Command {
+	return c.commands
+}
+
 // ExecuteCommand handles command-line arguments directly from os.Args.
 func (c *Commander) ExecuteCommand() {
 	if err := c.Run(os.Args[1:]); err != nil {
