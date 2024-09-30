@@ -3,6 +3,7 @@ package isomer
 import (
 	"errors"
 	"fmt"
+	"os"
 )
 
 // Command represents a CLI command with a name, description, and an action function.
@@ -56,5 +57,13 @@ func (c *Commander) ListCommands() {
 	fmt.Println("Available commands:")
 	for _, cmd := range c.commands {
 		fmt.Printf("  %s: %s\n", cmd.Name, cmd.Description)
+	}
+}
+
+// ExecuteCommand handles command-line arguments directly from os.Args.
+func (c *Commander) ExecuteCommand() {
+	if err := c.Run(os.Args[1:]); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
