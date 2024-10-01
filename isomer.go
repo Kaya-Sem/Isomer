@@ -13,17 +13,24 @@ type Command struct {
 	Action      func(args []string)
 }
 
+// DefaultHandler represents a default action based on the number of arguments.
+type DefaultHandler struct {
+	Name        string
+	Description string
+	Action      func(args []string)
+}
+
 // Commander manages commands and dispatches them.
 type Commander struct {
 	commands        map[string]Command
-	defaultHandlers map[int]func(args []string)
+	defaultHandlers map[int]DefaultHandler
 }
 
 // NewCommander creates a new Commander instance.
 func NewCommander() *Commander {
 	return &Commander{
 		commands:        make(map[string]Command),
-		defaultHandlers: make(map[int]func(args []string)),
+		defaultHandlers: make(map[int]DefaultHandler),
 	}
 }
 
@@ -36,9 +43,13 @@ func (c *Commander) RegisterNamedCommand(name, description string, action func(a
 	}
 }
 
-// RegisterDefaultHandler registers a default action based on the number of arguments when no commmand is given.
-func (c *Commander) RegisterDefaultHandler(argCount int, action func(args []string)) {
-	c.defaultHandlers[argCount] = action
+// RegisterDefaultHandler registers a default handler based on the number of arguments.
+func (c *Commander) RegisterDefaultHandler(argCount int, name, description string, action func(args []string)) {
+	c.defaultHandlers[argCount] = DefaultHandler{
+		Name:        name,
+		Description: description,
+		Action:      action,
+	}
 }
 
 // Run parses and executes the appropriate command based on the input arguments.
@@ -66,7 +77,7 @@ func (c *Commander) defaultOperation(args []string) error {
 
 	// Check if a default handler exists for the given number of arguments
 	if handler, exists := c.defaultHandlers[argCount]; exists {
-		handler(args)
+		handler.Action(args)
 		return nil
 	}
 
@@ -78,6 +89,11 @@ func (c *Commander) ListCommands() {
 	fmt.Println("Available commands:")
 	for _, cmd := range c.commands {
 		fmt.Printf("  %s: %s\n", cmd.Name, cmd.Description)
+	}
+
+	fmt.Println("Default handlers:")
+	for argCount, handler := range c.defaultHandlers {
+		fmt.Printf("  Default for %d args: %s - %s\n", argCount, handler.Name, handler.Description)
 	}
 }
 
