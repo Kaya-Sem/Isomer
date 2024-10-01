@@ -55,6 +55,7 @@ func (c *Commander) RegisterDefaultHandler(argCount int, name, description strin
 // Run parses and executes the appropriate command based on the input arguments.
 func (c *Commander) Run(args []string) error {
 	if len(args) < 1 {
+		c.ListCommands()
 		return errors.New("no arguments provided")
 	}
 
